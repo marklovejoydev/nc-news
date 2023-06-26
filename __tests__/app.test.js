@@ -1,0 +1,22 @@
+const request = require("supertest");
+const app = require("../app");
+
+describe('GET /api/topics', () => {
+    test('status 200, responds with an array of objects with properties',() =>{
+        return request(app)
+        .get('/api/topics')
+        .expect(200)
+        .then(({body})=>{
+            const { topics } =body
+            topics.forEach(topic => {
+                expect(topic).toHaveProperty('description', expect.any(String))
+                expect(topic).toHaveProperty('slug', expect.any(String))
+            });
+        })
+    })
+    test('status 404, responds with path not found when passed incorrect path',() =>{
+        return request(app)
+        .get('/api/notopics')
+        .expect(404)
+    })
+})
