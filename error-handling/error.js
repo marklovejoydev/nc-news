@@ -1,3 +1,8 @@
+exports.handleCustomErrors = (err, req, res, next) => {
+    if(err.msg){
+    res.status(400).send({msg: "Bad request"})
+    } else next()
+}
 
 exports.handleServiceErrors = (err, req, res, next) => {
     

@@ -59,4 +59,12 @@ describe('GET /api/articles/:article_id',() => {
             expect(article.article_id).toBe(1);
         })
     })
+    test('status 400, Responds with an error msg of bad request when passed an endpoint that does not exist', () => {
+        return request(app)
+        .get('/api/articles/99')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request");
+        })
+    })
 })
