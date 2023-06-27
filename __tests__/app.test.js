@@ -115,3 +115,39 @@ describe('GET /api/articles', () => {
         })
     })
 })
+describe.only('GET /api/articles/:article_id/comments',() =>{
+    test('200, checks if id exists before returning an array of comments related to the requested id', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            const comments = body
+            const regEx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g
+            expect(comments).toHaveLength(11)
+            comments.forEach((comment) => {
+                expect(comment).toHaveProperty('comment_id', expect.any(Number))
+                expect(comment).toHaveProperty('votes', expect.any(Number))
+                expect(comment).toHaveProperty('created_at', expect.stringMatching(regEx))
+                expect(comment).toHaveProperty('author', expect.any(String))
+                expect(comment).toHaveProperty('body', expect.any(String))
+                expect(comment).toHaveProperty('article_id', expect.any(Number))  
+            })
+        })
+    })
+    test('status 400, Responds with an error msg of "Bad request" when passed an endpoint that is invalid', () => {
+        return request(app)
+        .get('/api/articles/frog')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request");
+        })
+    })
+    test('status 404, Responds with an error msg of "Not found" when passed an ID that can not be found', () => {
+        return request(app)
+        .get('/api/articles/20/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Not found");
+        })
+    })
+})
