@@ -55,17 +55,17 @@ describe('GET /api/articles/:article_id',() => {
         .expect(200)
         .then(({body}) => {
             const article  = body;
-            expect(article).toHaveProperty('article_id');
-            expect(article).toHaveProperty('title');
-            expect(article).toHaveProperty('topic');
-            expect(article).toHaveProperty('author');
-            expect(article).toHaveProperty('body');
-            expect(article).toHaveProperty('votes');
-            expect(article).toHaveProperty('article_img_url');
+            expect(article).toHaveProperty('article_id', expect.any(Number));
+            expect(article).toHaveProperty('title', expect.any(String));
+            expect(article).toHaveProperty('topic', expect.any(String));
+            expect(article).toHaveProperty('author', expect.any(String));
+            expect(article).toHaveProperty('body', expect.any(String));
+            expect(article).toHaveProperty('votes', expect.any(Number));
+            expect(article).toHaveProperty('article_img_url', expect.any(String));
             expect(article.article_id).toBe(1);
         })
     })
-    test('status 400, Responds with an error msg of "bad request" when passed an endpoint that is invalid', () => {
+    test('status 400, Responds with an error msg of "Bad request" when passed an endpoint that is invalid', () => {
         return request(app)
         .get('/api/articles/frogs')
         .expect(400)
