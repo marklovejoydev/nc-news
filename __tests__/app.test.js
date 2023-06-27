@@ -19,7 +19,7 @@ describe('404 will test for path not found',() =>{
         .get('/api/notopics')
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Sorry this does not exist");
+            expect(body.msg).toBe("Not found");
           });
     })
 })
@@ -56,15 +56,30 @@ describe('GET /api/articles/:article_id',() => {
         .then(({body}) => {
             const article  = body;
             expect(article).toHaveProperty('article_id');
+            expect(article).toHaveProperty('title');
+            expect(article).toHaveProperty('topic');
+            expect(article).toHaveProperty('author');
+            expect(article).toHaveProperty('body');
+            expect(article).toHaveProperty('votes');
+            expect(article).toHaveProperty('article_img_url');
             expect(article.article_id).toBe(1);
         })
     })
-    test('status 400, Responds with an error msg of bad request when passed an endpoint that does not exist', () => {
+    test('status 400, Responds with an error msg of "bad request" when passed an endpoint that is invalid', () => {
         return request(app)
-        .get('/api/articles/99')
+        .get('/api/articles/frogs')
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe("Bad request");
         })
     })
+    test('status 404, Responds with an error msg of "Not found" when passed an ID that can not be found', () => {
+        return request(app)
+        .get('/api/articles/20')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Not found");
+        })
+    })
+
 })
