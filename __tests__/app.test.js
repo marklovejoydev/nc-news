@@ -48,3 +48,15 @@ describe('GET /api',() => {
         })
     })
 })
+describe('GET /api/articles/:article_id',() => {
+    test('status 200, Responds with an article object with properties of requested id', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({body}) => {
+            const article  = body;
+            expect(article).toHaveProperty('article_id');
+            expect(article.article_id).toBe(1);
+        })
+    })
+})
