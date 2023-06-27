@@ -1,7 +1,7 @@
 const express = require("express")
 const {getTopics} = require('./controller/topics-controller')
 const {getApi} = require('./controller/api-controller')
-const { getArticleById } = require("./controller/article-controller")
+const { getArticleById, getArticles } = require("./controller/article-controller")
 const {handleNotFoundErrors, handleServiceErrors, handleCustomErrors, handlePsqlErrors} = require('./error-handling/error')
 const app = express()
 
@@ -11,6 +11,8 @@ app.get('/api/topics', getTopics)
 app.get('/api', getApi)
 
 app.get('/api/articles/:article_id', getArticleById)
+
+app.get('/api/articles', getArticles)
 
 app.use(handlePsqlErrors)
 
