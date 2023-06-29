@@ -4,7 +4,7 @@ exports.selectArticleById = (id) => {
     return db
     .query('SELECT * FROM articles WHERE article_id = $1;', [id])
     .then(({ rows }) => {
-      if (rows.length === 0) {
+      if (!rows.length) {
         return Promise.reject({ status: 404, msg: 'Not found' })
       } 
       return rows[0]
@@ -23,7 +23,10 @@ exports.checkArticleExists = (article_id) => {
 }
 
 exports.selectAllArticles = () => {
-let queryString = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url ORDER BY articles.created_at DESC;"
+let queryString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
+CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
+FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
+ORDER BY articles.created_at DESC;`
 return db.query(queryString).then(({ rows }) => {
   
   return rows
@@ -43,3 +46,21 @@ exports.selectCommentsByArticleId = (article_id) => {
   })
 
 }
+exports.insertComments = (username, body, article_id) => {
+  if (!body || !username) {
+    return Promise.reject({status: 400 , msg: 'Bad request'})
+  }
+  const queryString = `
+  INSERT INTO comments
+  (author, body, article_id)
+  VALUES
+  ($1, $2, $3)
+  RETURNING*;
+  `
+  const queryValues = [username, body, article_id]
+  return db.query(queryString, queryValues)
+  .then(({rows})=> {
+    return rows[0]
+  })
+}
+
