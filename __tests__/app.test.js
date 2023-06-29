@@ -162,3 +162,78 @@ describe('GET /api/articles/:article_id/comments',() =>{
         })
     })
 })
+describe('POST /api/articles/:article_id/comments', () => {
+    test("status:201, should add a comment to the database", () => {
+      const newComment = {
+        username : "butter_bridge",
+        body : "I have no idea what is going on anymore"
+      }
+        return request(app)
+        .post("/api/articles/2/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+            const postComment = body
+            expect(postComment.author).toBe("butter_bridge")
+            expect(postComment.body).toBe('I have no idea what is going on anymore')
+        })
+    })
+    test("status:201, should add only the comments allowed to the database and respond with the only allowed objects", () => {
+        const newComment = {
+          username : "butter_bridge",
+          body : "I have no idea what is going on anymore",
+          read_value : "Very Good"
+        }
+          return request(app)
+          .post("/api/articles/2/comments")
+          .send(newComment)
+          .expect(201)
+          .then(({ body }) => {
+              const postComment = body
+              expect(postComment.author).toBe("butter_bridge")
+              expect(postComment.body).toBe('I have no idea what is going on anymore')
+              expect(postComment.read_value).not.toBe('Very Good')
+              expect(postComment).not.toHaveProperty("read_value")
+          })
+      })
+    test("status 404, will return a 404 when trying to comment to an article that does not exist", () => {
+        return request(app)
+        .post('/api/articles/20/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Not found");
+        })
+    })
+    test('status 400, Responds with an error msg of "Bad request" when passed an endpoint that is invalid', () => {
+        return request(app)
+        .post('/api/articles/frog/comments')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request");
+        })
+    })
+    test('status 400, Responds with an error msg of "Bad request" when passed without a body', () => {
+        const newComment = {
+            username : "butter_bridge",
+        }
+        return request(app)
+        .post('/api/articles/2/comments')
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request");
+        })
+    })
+    test('status 400, Responds with an error msg of "Bad request" when passed without a username', () => {
+        const newComment = {
+            body : "butter_bridge",
+        }
+        return request(app)
+        .post('/api/articles/2/comments')
+        .expect(400)
+        .send(newComment)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request");
+        })
+    })
+});
