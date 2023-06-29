@@ -2,7 +2,7 @@ const express = require("express")
 const {getTopics} = require('./controller/topics-controller')
 const {getApi} = require('./controller/api-controller')
 const { getArticleById, getArticles, getCommentsByArticleId } = require("./controller/article-controller")
-const {handleNotFoundErrors, handleServiceErrors, handleCustomErrors, handlePsqlErrors} = require('./error-handling/error')
+const { allPathErrors,handleServiceErrors, handleCustomErrors, handlePsqlErrors} = require('./error-handling/error')
 const app = express()
 
 
@@ -20,7 +20,7 @@ app.use(handlePsqlErrors)
 
 app.use(handleCustomErrors)
 
-app.use(handleNotFoundErrors)
+app.use("*", allPathErrors)
 
 app.use(handleServiceErrors)
 
