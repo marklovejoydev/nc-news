@@ -134,6 +134,17 @@ describe('GET /api/articles/:article_id/comments',() =>{
             })
         })
     })
+    test('status 200, responds with an empty array when the id is valid but there is no comments', () => {
+        return request(app)
+        .get('/api/articles/7/comments')
+        .expect(200)
+        .then(({body}) => {
+            const comments = body
+            expect(comments).toHaveLength(0)
+            expect(comments).toEqual([])
+            })
+        
+    })
     test('status 400, Responds with an error msg of "Bad request" when passed an endpoint that is invalid', () => {
         return request(app)
         .get('/api/articles/frog')
