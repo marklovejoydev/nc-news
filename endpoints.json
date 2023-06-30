@@ -63,5 +63,14 @@
       "username" : "butter_bridge",
       "body" : "I have no idea what is going on anymore"
     }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "will update the vote count given an amount to increase",
+    "queries": [],
+    "exampleResponse":
+    {
+     "inc_votes" : 10 
+    }
   }
+
 }

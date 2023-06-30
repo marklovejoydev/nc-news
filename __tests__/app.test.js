@@ -4,6 +4,7 @@ const testData = require('../db/data/test-data');
 const seed = require('../db/seeds/seed');
 const db = require('../db/connection');
 const endPoints = require('../endpoints.json')
+const jestSorted = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 
@@ -237,3 +238,73 @@ describe('POST /api/articles/:article_id/comments', () => {
         })
     })
 });
+describe('PATCH /api/articles/:article_id', () => {
+    test('status:200, should update the article votes property with the amount passed', () => {
+      const votes = { inc_votes : 10 }
+      return request(app)
+      .patch('/api/articles/1')
+      .send(votes)
+      .expect(200)
+      .then(({body}) => {
+        const article = body
+        const regEx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g
+                expect(article).toHaveProperty('article_id', expect.any(Number))
+                expect(article).toHaveProperty('title', expect.any(String))
+                expect(article).toHaveProperty('topic', expect.any(String))
+                expect(article).toHaveProperty('author', expect.any(String))
+                expect(article).toHaveProperty('body', expect.any(String))
+                expect(article).toHaveProperty('created_at', expect.stringMatching(regEx))
+                expect(article).toHaveProperty('votes', expect.any(Number))
+                expect(article).toHaveProperty('article_img_url', expect.any(String))
+        })
+      })
+      test("status 200: if passed more than the required property only includes the correct property and ignores the incorrect one", () => {
+        const votes = { inc_votes: 10, moral: "whats that?" };
+        return request(app)
+            .patch("/api/articles/9")
+            .send(votes)
+            .expect(200)
+            .then(({ body }) => {
+                const article = body
+        const regEx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g
+                expect(article).toHaveProperty('article_id', expect.any(Number))
+                expect(article).toHaveProperty('title', expect.any(String))
+                expect(article).toHaveProperty('topic', expect.any(String))
+                expect(article).toHaveProperty('author', expect.any(String))
+                expect(article).toHaveProperty('body', expect.any(String))
+                expect(article).toHaveProperty('created_at', expect.stringMatching(regEx))
+                expect(article).toHaveProperty('votes', expect.any(Number))
+                expect(article).toHaveProperty('article_img_url', expect.any(String))
+        })
+      })
+      test("status 404: should respond with 'Not found' when the id does not exist", () => {
+        const votes = { inc_votes: 10 };
+        return request(app)
+            .patch("/api/articles/20")
+            .send(votes)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+    });
+    test("status 400: should return an error 'Bad request' when passed an invalid data type", () => {
+        const votes = { inc_votes: "flamingo" };
+        return request(app)
+            .patch("/api/articles/3")
+            .send(votes)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            })
+    })
+    test("status 400: should return an error 'Bad request' when passed a bad endpoint", () => {
+        const votes = { inc_votes: 10 };
+        return request(app)
+            .patch("/api/articles/toads")
+            .send(votes)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad request");
+            });
+        })
+})
