@@ -72,6 +72,9 @@ exports.insertComments = (username, body, article_id) => {
   RETURNING *;
   `, [votes, id])
   .then(({rows})=> {
+    if(!rows.length){
+      return Promise.reject({status: 404, msg:"Not found"})
+    }
     return rows[0]
   })
   }

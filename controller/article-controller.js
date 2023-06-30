@@ -45,10 +45,9 @@ exports.postComments = (req, res, next) => {
 }
 
 exports.patchArticle = (req, res , next) => {
-    const votes = req.body.inc_votes
-    const id = req.params.article_id
-    checkArticleExists(id)
-    .then(()=> updateArticle(votes, id))
+    const { inc_votes: votes } = req.body
+    const { article_id: id } = req.params
+    updateArticle(votes, id)
     .then((updatedVotes)=>{
         res.status(200).send(updatedVotes)
     })
