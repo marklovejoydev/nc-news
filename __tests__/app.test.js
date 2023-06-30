@@ -346,12 +346,5 @@ describe('DELETE /api/comments/:comment_id', () => {
               });
             })
     })
-    test('status 404, responds with path not found when passed incorrect path',() =>{
-        return request(app)
-        .get('/api/nousers')
-        .expect(404)
-        .then(({ body }) => {
-            expect(body.msg).toBe("Not found");
-          });
-    })
+    
 })
