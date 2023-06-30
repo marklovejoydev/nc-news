@@ -308,3 +308,27 @@ describe('PATCH /api/articles/:article_id', () => {
             });
         })
 })
+describe('DELETE /api/comments/:comment_id', () => {
+    test('status:204, when passed a comment_id should delete that comment and respond with no content', () => {
+      return request(app)
+      .delete('/api/comments/5')
+      .expect(204)
+    })
+    test('status:404, when passed a comment_id thats does not exist, should should return 404 msg Not found', () => {
+      return request(app)
+      .delete('/api/comments/20')
+      .expect(404)
+      .then(({body}) => {
+        expect(body.msg).toBe('Not found')
+      })
+    })
+    test('status:400, when passed a comment_id thats not valid, should should return 400 msg Bad request', () => {
+      return request(app)
+      .delete('/api/comments/flamingo')
+      .expect(400)
+      .then(({body}) => {
+        expect(body.msg).toBe('Bad request')
+      })
+    })
+  })
+  

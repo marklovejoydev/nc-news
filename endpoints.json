@@ -71,6 +71,11 @@
     {
      "inc_votes" : 10 
     }
-  }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "will DELETE a comment when passed a comment_id",
+    "queries": [],
+    "exampleResponse": null
+    }
 
 }
