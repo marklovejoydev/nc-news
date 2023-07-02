@@ -436,3 +436,23 @@ describe('GET /api/articles? ', () =>{
           });
       });
 })
+describe('GET /api/articles/:article_id with comment_count added', () => {
+    test('status 200, should return the article with comment count', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({body}) => {
+          const article = body
+          const regEx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g
+                  expect(article).toHaveProperty('article_id', expect.any(Number))
+                  expect(article).toHaveProperty('title', expect.any(String))
+                  expect(article).toHaveProperty('topic', expect.any(String))
+                  expect(article).toHaveProperty('author', expect.any(String))
+                  expect(article).toHaveProperty('body', expect.any(String))
+                  expect(article).toHaveProperty('created_at', expect.stringMatching(regEx))
+                  expect(article).toHaveProperty('votes', expect.any(Number))
+                  expect(article).toHaveProperty('article_img_url', expect.any(String))
+                  expect(article).toHaveProperty('comment_count', expect.any(Number))
+        })
+    })
+})
