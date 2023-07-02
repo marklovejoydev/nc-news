@@ -1,4 +1,5 @@
 const { selectArticleById, selectAllArticles, selectCommentsByArticleId, checkArticleExists, insertComments, updateArticle} = require("../model/article-model")
+const { selectArticlesByTopic } = require("../model/topics-model")
 
 exports.getArticleById = (req, res, next) => {
     const {article_id} = req.params
@@ -11,13 +12,21 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    selectAllArticles()
+    const {topic, sort_by, order} = req.query
+    if(topic){
+        selectArticlesByTopic(topic, sort_by, order)
+        .then((articles)=>{
+            res.status(200).send({articles})
+        })
+        .catch(next)
+    }else{
+    selectAllArticles(sort_by, order)
         .then((articles) => {
             res.status(200).send({articles})
         })
         .catch(next)
 }
-
+}
 exports.getCommentsByArticleId = (req, res, next) => {
     const {article_id} = req.params
     const promises = [selectCommentsByArticleId(article_id)]
