@@ -22,16 +22,34 @@ exports.checkArticleExists = (article_id) => {
   })
 }
 
-exports.selectAllArticles = () => {
-let queryString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
-CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
-FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
-ORDER BY articles.created_at DESC;`
-return db.query(queryString).then(({ rows }) => {
-  
-  return rows
-})
-}
+exports.selectAllArticles = (sort_by = "created_at", order = "DESC") => {
+  const validSortBy = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"];
+  if (!validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
+  const validOrder = ["ASC", "DESC"];
+  if (!validOrder.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
+  let queryString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
+    CAST(COUNT(comments.comment_id) AS INT) AS comment_count 
+    FROM articles 
+    LEFT JOIN comments ON articles.article_id = comments.article_id 
+    GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
+
+  if (sort_by === "created_at") {
+    queryString += ` ORDER BY created_at ${order}`;
+  } else {
+    queryString += ` ORDER BY ${sort_by} ${order}`;
+  }
+
+  return db.query(queryString).then(({ rows }) => {
+    return rows;
+  });
+};
+
 
 exports.selectCommentsByArticleId = (article_id) => {
   let query = "SELECT * FROM comments "

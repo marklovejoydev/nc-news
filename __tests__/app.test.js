@@ -348,3 +348,91 @@ describe('DELETE /api/comments/:comment_id', () => {
     })
     
 })
+describe('GET /api/articles? ', () =>{
+    test('status 200, will test the for queries against the endpoint testing for queries topic and return all articles filtered by that topic',() => {
+        const topic = 'mitch'
+        return request(app)
+      .get('/api/articles')
+      .query({ topic }) 
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        articles.forEach((article) => {
+            expect(article.topic).toEqual(topic);
+        });
+    })
+})
+    test('status 200, will return all articles if query is omitted',()=>{
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+            const { articles } = body
+            const regEx = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g
+            expect(articles).toHaveLength(13)
+            articles.forEach((article) => {
+                expect(article).toHaveProperty('author', expect.any(String));
+                expect(article).toHaveProperty('title', expect.any(String));
+                expect(article).toHaveProperty('article_id', expect.any(Number));
+                expect(article).toHaveProperty('topic', expect.any(String));
+                expect(article).toHaveProperty('created_at', expect.stringMatching(regEx));
+                expect(article).toHaveProperty('votes', expect.any(Number));
+                expect(article).toHaveProperty('article_img_url',expect.any(String));
+                expect(article).toHaveProperty('comment_count', expect.any(Number));
+                expect(article).not.toHaveProperty('body');
+              });
+            })
+    })
+    test('200, will sort by any valid column',() => {
+        const topic = 'mitch'
+        const sort_by ='title'
+        const order = 'ASC'
+        return request(app)
+        .get('/api/articles')
+        .query({ topic, sort_by, order })
+        .expect(200)
+        .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy(sort_by, order, { ascending: true })
+        })
+    })
+    test('200, will sort by descending order of chosen column',() => {
+        const topic = 'mitch';
+        const sort_by = 'title';
+        const order = 'DESC';
+        return request(app)
+        .get('/api/articles')
+        .query({ topic, sort_by, order })
+        .expect(200)
+        .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy(sort_by, { descending: true });
+        })
+    })
+    test('400, returns Bad Request for invalid sort_by column', () => {
+        const topic = 'mitch';
+        const sort_by = 'invalid_column';
+      
+        return request(app)
+          .get('/api/articles')
+          .query({ topic, sort_by })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad request');
+          });
+      });
+      test('400, returns Bad Request for invalid order', () => {
+        const topic = 'mitch';
+        const sort_by = 'title';
+        const order = 'invalid_order';
+      
+        return request(app)
+          .get('/api/articles')
+          .query({ topic, sort_by, order })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad request');
+          });
+      });
+})
