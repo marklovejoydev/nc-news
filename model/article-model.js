@@ -23,7 +23,7 @@ exports.checkArticleExists = (article_id) => {
 }
 
 exports.selectAllArticles = (sort_by = "created_at", order = "DESC") => {
-  const validSortBy = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"];
+  const validSortBy = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url","comment_count"];
   if (!validSortBy.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
